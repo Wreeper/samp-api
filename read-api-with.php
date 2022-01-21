@@ -2,7 +2,7 @@
 //If you use PHP you can make the API functional with CURL and by checking status codes.
 
 $apiurl = "http://localhost:19231/?server=";
-$requrl = htmlspecialchars($_GET["server"]);
+$requrl = basename($_SERVER[REQUEST_URI]);
 header('Content-Type: application/json');
 $url = $apiurl . $requrl;
 $ch = curl_init($url);
@@ -16,14 +16,19 @@ curl_close($ch);
 
 if(empty($requrl)) {
 echo '{"status": "failed", "reason": "You have not specified a server to check. For documentation please read https://api.wreeper.top/docs/samp/"}';
+http_response_code(200);
 exit();
 }
+
+
 if($httpcode == 0) {
 echo '{"status": "failed", "reason": "The API seems to be down. Please try again later. -api.wreeper.top"}';
 } else if($httpcode == 404) {
 echo '{"status": "failed", "reason": "Cannot connect to the specified SAMP server."}';
+http_response_code(200);
 } else if($httpcode == 200) {
 $returnapi = file_get_contents($apiurl . $requrl);
 echo $returnapi;
+http_response_code(200);
 }
 ?>
